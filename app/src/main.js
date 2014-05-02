@@ -25,10 +25,12 @@ define(function(require, exports, module) {
 // http://hellorun.helloenjoy.com/
 // http://workshop.chromeexperiments.com/projects/armsglobe
   
+    var thepainting = '<iframe id="genframe" width="900" height="535" src="/gen.html" frameborder="0"></iframe>';
+
     var surface = new Surface({
-        size: [200,200],
-        content: thevideo,
-        classes: ["white"]
+        size: [900,535],
+        content: thepainting,
+        classes: ["black"]
     });
 
     // var surface = new Surface({
@@ -38,48 +40,21 @@ define(function(require, exports, module) {
     //     classes: ["black"]
     // });
 
-    var particle = new Rectangle({
+    var particle = new Particle({
       mass : 1,
-      size : [200,200],
       position : [0,0,0],
       velocity : [0,0,0]
     });
     PE.addBody(particle);
 
-    var particle2 = new Particle({
-      mass : 1,
-      position : [0,100,0],
-      velocity : [0,0,0]
-    });
-    PE.addBody(particle2);
-
     var spring = new Spring({
-      anchor : [0,0,0],
-      period : 400,
+      anchor : [60,100,100],
+      period : 90,
       dampingRatio : 0.03,
       length : 0
     });
 
-    var spring2 = new Spring({
-      anchor : [300, 0, -200],
-      period : 400,
-      dampingRatio : 0.03,
-      length : 300
-    });
-
-    var spring3 = new Spring({
-      anchor : [0, -200, 800],
-      period : 400,
-      dampingRatio : 0.03,
-      length : 0
-    });
-
-    var spring4 = new Spring({
-      anchor : [0, 100, 0],
-      period : 400,
-      dampingRatio : 0.03,
-      length : 0
-    });
+    PE.attach(spring, particle);
 
     // var options = Drag.DEFAULT_OPTIONS;
     // options.strength = 0.1;
@@ -91,23 +66,34 @@ define(function(require, exports, module) {
     //   damping:0.02 
     // });
 
-    surface.on("mousedown", function(){
-       var force = new Vector(0, 0, -0.5);
+    var applyForce = function(evt){
+       var force = new Vector(Math.random()/10, Math.random()/10, 0.25 + Math.random()/4);
        var loc = new Vector(0, 0, 0);
        particle.applyForce(force, loc);
-       particle2.applyForce(new Vector(0, 0, -0.5));
-    });
-  
-    PE.attach(spring, particle);
-    PE.attach(spring2, particle);
-    PE.attach(spring3, particle);
-    PE.attach(spring4, particle2);
+    };
+    surface.on("mousedown", applyForce);
+
+    document.body.addEventListener('mousedown', applyForce, true); 
 
     //PE.attach(rotationalDrag, particle);
     //PE.attach(rotationalSpring, particle);
-
-    var center = new Modifier({origin:[0.5, 0.5]});
-    mainContext.add(center).add(particle).add(particle2).add(surface);
+    //var center = new Modifier({origin:[0.25, 0.25]});
+    
+    mainContext.add(particle).add(surface);
 
     mainContext.setPerspective(1000);
+
+    setInterval(function() {
+       var force = new Vector(1/25, 1/25, 1/6);
+       particle.applyForce(force);
+       document.getElementById('genframe').contentWindow.location.reload();
+    }, 60000)
+
+    setInterval(function() {
+       var force = new Vector(0.01, 0.01, 0);
+       particle.applyForce(force);
+       setTimeout(function() {
+         particle.applyForce(force);
+       }, 300);
+    }, 5000)
 });

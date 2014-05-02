@@ -43,6 +43,7 @@
     "test": "grunt test"
   },
   "dependencies": {
-    "phantomjs": "~1.9.7-4"
+    "phantomjs": "~1.9.7-4",
+    "pdf-extract": "~1.0.7"
   }
 }
